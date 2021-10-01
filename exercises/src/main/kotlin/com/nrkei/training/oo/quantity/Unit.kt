@@ -1,6 +1,7 @@
 package com.nrkei.training.oo.quantity
 
-import kotlin.math.PI
+import com.nrkei.training.oo.quantity.Quantity.Companion.EPSILON
+import kotlin.math.roundToLong
 
 class Unit {
 
@@ -38,26 +39,43 @@ class Unit {
         val Number.furlongs get() = Quantity(this, FURLONG)
         val Number.miles get() = Quantity(this, MILE)
         val Number.leagues get() = Quantity(this, LEAGUE)
+
+        private val CELSIUS = Unit()
+        private val FAHRENHEIT = Unit(5 / 9.0, 32, CELSIUS)
+        private val GAS_MARK = Unit(125 / 9.0, -218.0 / 25, CELSIUS)
+        private val KELVIN = Unit(1, 273.15, CELSIUS)
+        private val RANKINE = Unit(5 / 9.0, 491.67, CELSIUS)
+
+        val Number.celsius get() = Quantity(this, CELSIUS)
+        val Number.fahrenheit get() = Quantity(this, FAHRENHEIT)
+        val Number.gasMark get() = Quantity(this, GAS_MARK)
+        val Number.kelvin get() = Quantity(this, KELVIN)
+        val Number.rankine get() = Quantity(this, RANKINE)
     }
 
     private val baseUnit: Unit
     private val baseUnitRatio: Double
+    private val offset: Double
 
     private constructor() {
         baseUnit = this
         baseUnitRatio = 1.0
+        offset = 0.0
     }
 
-    private constructor(relativeRatio: Number, relativeUnit: Unit) {
+    private constructor(relativeRatio: Number, offset: Number, relativeUnit: Unit) {
         this.baseUnit = relativeUnit.baseUnit
         baseUnitRatio = relativeRatio.toDouble() * relativeUnit.baseUnitRatio
+        this.offset = offset.toDouble()
     }
 
+    private constructor(relativeRatio: Number, relativeUnit: Unit) : this(relativeRatio, 0, relativeUnit)
+
     internal fun convertedAmount(otherAmount: Double, other: Unit) =
-        (otherAmount * other.baseUnitRatio / this.baseUnitRatio)
+        ((otherAmount - other.offset) * other.baseUnitRatio / this.baseUnitRatio + this.offset)
             .also { require(this isCompatible other) { "Incompatible Units" } }
 
-    internal fun hashCode(amount: Double) = (amount * baseUnitRatio).hashCode()
+    internal fun hashCode(amount: Double) = ((amount - offset) * baseUnitRatio / EPSILON).roundToLong().hashCode()
 
     internal infix fun isCompatible(other: Unit) = this.baseUnit == other.baseUnit
 }
