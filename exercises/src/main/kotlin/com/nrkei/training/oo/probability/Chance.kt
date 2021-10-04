@@ -6,11 +6,12 @@
 
 package com.nrkei.training.oo.probability
 
+import com.nrkei.training.oo.order.Orderable
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 
 // Understands the likelihood of something occurring
-class Chance(valueAsFraction: Number) {
+class Chance(valueAsFraction: Number) : Orderable<Chance> {
     private val fraction = valueAsFraction.toDouble()
 
     init {
@@ -35,4 +36,6 @@ class Chance(valueAsFraction: Number) {
 
     // Implemented with DeMorgan's Law https://en.wikipedia.org/wiki/De_Morgan%27s_laws
     infix fun or(other: Chance) = !(!this and !other)
+
+    override fun isBetterThan(other: Chance) = this.fraction < other.fraction
 }
