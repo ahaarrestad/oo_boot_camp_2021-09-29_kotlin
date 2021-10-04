@@ -1,8 +1,9 @@
 package com.nrkei.training.oo.quantity
 
+import com.nrkei.training.oo.order.Orderable
 import kotlin.math.absoluteValue
 
-open class IntervalQuantity internal constructor(amount: Number, protected val unit: Unit) {
+open class IntervalQuantity internal constructor(amount: Number, protected val unit: Unit) : Orderable<IntervalQuantity> {
     companion object {
         internal const val EPSILON = 1e-10
     }
@@ -20,4 +21,6 @@ open class IntervalQuantity internal constructor(amount: Number, protected val u
     override fun hashCode() = unit.hashCode(amount)
 
     private infix fun isCompatible(other: IntervalQuantity) = this.unit.isCompatible(other.unit)
+
+    override fun isBetterThan(other: IntervalQuantity) = this.amount > convertedAmount(other)
 }
