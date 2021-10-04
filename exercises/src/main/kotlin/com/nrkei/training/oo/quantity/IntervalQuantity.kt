@@ -3,7 +3,9 @@ package com.nrkei.training.oo.quantity
 import com.nrkei.training.oo.order.Orderable
 import kotlin.math.absoluteValue
 
-open class IntervalQuantity internal constructor(amount: Number, protected val unit: Unit) : Orderable<IntervalQuantity> {
+open class IntervalQuantity internal constructor(amount: Number, protected val unit: Unit)
+    : Orderable<IntervalQuantity> {
+
     companion object {
         internal const val EPSILON = 1e-10
     }
