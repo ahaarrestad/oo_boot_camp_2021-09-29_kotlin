@@ -6,8 +6,6 @@
 
 package com.nrkei.training.oo.graph
 
-import java.awt.image.MultiPixelPackedSampleModel
-
 // Understands its neighbors
 class Node {
     private val neighbors = mutableListOf<Node>()

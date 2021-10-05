@@ -1,12 +1,15 @@
+/*
+ * Copyright (c) 2021 by Fred George
+ * May be used freely except for training; license required for training.
+ * @author Fred George  fredgeorge@acm.org
+ */
+
 package com.nrkei.training.oo.unit
 
 import com.nrkei.training.oo.graph.Node
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import kotlin.time.days
-import kotlin.time.hours
-import kotlin.time.minutes
 
 // Ensures graph operations work correctly
 internal class GraphTest {
