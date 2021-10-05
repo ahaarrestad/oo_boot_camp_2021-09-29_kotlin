@@ -6,6 +6,8 @@
 
 package com.nrkei.training.oo.graph
 
+import org.jetbrains.annotations.NotNull
+
 // Understands its neighbors
 class Node {
     private val neighbors = mutableListOf<Node>()
@@ -26,10 +28,12 @@ class Node {
         if (this == destination) return 0
         if (this in visitedNodes) return UNREACHABLE
         visitedNodes.add(this)
-        neighbors.forEach {
-            it.hopCount(destination, visitedNodes).also { if (it != UNREACHABLE) return it + 1 }
-        }
-        return UNREACHABLE
+        return neighbors
+            .map { it.hopCount(destination, visitedNodes) }
+            .filterNot { it == UNREACHABLE }
+            .minOrNull()
+            ?.plus(1)
+            ?: UNREACHABLE
     }
 
     private val noVisitedNodes get() = mutableListOf<Node>()
