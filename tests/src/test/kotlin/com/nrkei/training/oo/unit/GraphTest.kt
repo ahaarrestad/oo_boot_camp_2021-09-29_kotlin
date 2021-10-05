@@ -38,4 +38,15 @@ internal class GraphTest {
         assertFalse(A canReach B)
         assertFalse(B canReach G)
     }
+
+    @Test internal fun `hop count`() {
+        assertEquals(0, B hopCount B)
+        assertEquals(1, B hopCount A)
+        assertEquals(1, B hopCount F)
+        assertEquals(2, B hopCount D)
+        assertEquals(4, C hopCount F)
+        assertThrows<IllegalArgumentException> { G hopCount B }
+        assertThrows<IllegalArgumentException> { A hopCount B }
+        assertThrows<IllegalArgumentException> { B hopCount G }
+    }
 }
