@@ -13,7 +13,7 @@ class Node {
     private val neighbors = mutableListOf<Node>()
 
     companion object {
-        private const val UNREACHABLE = -1
+        private const val UNREACHABLE = Double.POSITIVE_INFINITY
     }
 
     infix fun to(neighbor: Node) = neighbor.also { neighbors.add(neighbor) }
@@ -22,19 +22,13 @@ class Node {
 
     infix fun hopCount(destination: Node) = hopCount(destination, noVisitedNodes).also {
         require(it != UNREACHABLE) { "Destination is unreachable" }
-    }
+    }.toInt()
 
-    private fun hopCount(destination: Node, visitedNodes: MutableList<Node>): Int {
-        if (this == destination) return 0
+    private fun hopCount(destination: Node, visitedNodes: List<Node>): Double {
+        if (this == destination) return 0.0
         if (this in visitedNodes) return UNREACHABLE
-        visitedNodes.add(this)
-        return neighbors
-            .map { it.hopCount(destination, visitedNodes) }
-            .filterNot { it == UNREACHABLE }
-            .minOrNull()
-            ?.plus(1)
-            ?: UNREACHABLE
+        return neighbors.minOfOrNull { it.hopCount(destination, visitedNodes + this) + 1 } ?: UNREACHABLE
     }
 
-    private val noVisitedNodes get() = mutableListOf<Node>()
+    private val noVisitedNodes = emptyList<Node>()
 }
