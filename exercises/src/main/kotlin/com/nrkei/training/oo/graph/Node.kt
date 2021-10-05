@@ -26,6 +26,16 @@ class Node {
         return links.minOfOrNull { it.hopCount(destination, visitedNodes + this) } ?: UNREACHABLE
     }
 
+    infix fun cost(destination: Node) = cost(destination, noVisitedNodes).also {
+        require(it != UNREACHABLE) { "Destination is unreachable" }
+    }
+
+    internal fun cost(destination: Node, visitedNodes: List<Node>): Double {
+        if (this == destination) return 0.0
+        if (this in visitedNodes) return UNREACHABLE
+        return links.minOfOrNull { it.cost(destination, visitedNodes + this) } ?: UNREACHABLE
+    }
+
     private val noVisitedNodes = emptyList<Node>()
 
     infix fun cost(amount: Number) = LinkBuilder(amount.toDouble(), links)
