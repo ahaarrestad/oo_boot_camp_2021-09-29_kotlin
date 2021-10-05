@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021 by Fred George
+ * May be used freely except for training; license required for training.
+ * @author Fred George  fredgeorge@acm.org
+ */
+
 package com.nrkei.training.oo.graph
 
 import java.awt.image.MultiPixelPackedSampleModel
