@@ -6,6 +6,9 @@
 
 package com.nrkei.training.oo.graph
 
+import com.nrkei.training.oo.graph.Link.Companion.FEWEST_HOPS
+import com.nrkei.training.oo.graph.Link.Companion.LEAST_COST
+
 // Understands its neighbors
 class Node {
     private val links = mutableListOf<Link>()
@@ -14,26 +17,21 @@ class Node {
         private const val UNREACHABLE = Double.POSITIVE_INFINITY
     }
 
-    infix fun canReach(destination: Node) = hopCount(destination, noVisitedNodes) != UNREACHABLE
+    infix fun canReach(destination: Node) = cost(destination, noVisitedNodes, FEWEST_HOPS) != UNREACHABLE
 
-    infix fun hopCount(destination: Node) = hopCount(destination, noVisitedNodes).also {
-        require(it != UNREACHABLE) { "Destination is unreachable" }
-    }.toInt()
+    infix fun hopCount(destination: Node) = cost(destination, FEWEST_HOPS).toInt()
 
-    internal fun hopCount(destination: Node, visitedNodes: List<Node>): Double {
-        if (this == destination) return 0.0
-        if (this in visitedNodes) return UNREACHABLE
-        return links.minOfOrNull { it.hopCount(destination, visitedNodes + this) } ?: UNREACHABLE
-    }
+    infix fun cost(destination: Node) = cost(destination, LEAST_COST)
 
-    infix fun cost(destination: Node) = cost(destination, noVisitedNodes).also {
+    private fun cost(destination: Node, strategy: CostStrategy) = cost(destination, noVisitedNodes, strategy).also {
         require(it != UNREACHABLE) { "Destination is unreachable" }
     }
 
-    internal fun cost(destination: Node, visitedNodes: List<Node>): Double {
+    @Suppress("ComplexMethod")
+    internal fun cost(destination: Node, visitedNodes: List<Node>, strategy: CostStrategy): Double {
         if (this == destination) return 0.0
         if (this in visitedNodes) return UNREACHABLE
-        return links.minOfOrNull { it.cost(destination, visitedNodes + this) } ?: UNREACHABLE
+        return links.minOfOrNull { it.cost(destination, visitedNodes + this, strategy) } ?: UNREACHABLE
     }
 
     private val noVisitedNodes = emptyList<Node>()
