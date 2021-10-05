@@ -6,17 +6,15 @@
 
 package com.nrkei.training.oo.graph
 
-import org.jetbrains.annotations.NotNull
-
 // Understands its neighbors
 class Node {
-    private val neighbors = mutableListOf<Node>()
+    private val links = mutableListOf<Link>()
 
     companion object {
         private const val UNREACHABLE = Double.POSITIVE_INFINITY
     }
 
-    infix fun to(neighbor: Node) = neighbor.also { neighbors.add(neighbor) }
+    infix fun to(neighbor: Node) = neighbor.also { links.add(Link(neighbor)) }
 
     infix fun canReach(destination: Node) = hopCount(destination, noVisitedNodes) != UNREACHABLE
 
@@ -24,10 +22,10 @@ class Node {
         require(it != UNREACHABLE) { "Destination is unreachable" }
     }.toInt()
 
-    private fun hopCount(destination: Node, visitedNodes: List<Node>): Double {
+    internal fun hopCount(destination: Node, visitedNodes: List<Node>): Double {
         if (this == destination) return 0.0
         if (this in visitedNodes) return UNREACHABLE
-        return neighbors.minOfOrNull { it.hopCount(destination, visitedNodes + this) + 1 } ?: UNREACHABLE
+        return links.minOfOrNull { it.hopCount(destination, visitedNodes + this) } ?: UNREACHABLE
     }
 
     private val noVisitedNodes = emptyList<Node>()
