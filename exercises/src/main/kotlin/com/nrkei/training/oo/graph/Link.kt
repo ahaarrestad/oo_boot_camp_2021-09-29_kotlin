@@ -18,8 +18,8 @@ internal class Link internal constructor(private val target: Node, private val c
         return target.cost(destination, visitedNodes, strategy) + strategy(cost)
     }
 
-    internal fun path(destination: Node, visitedNodes: List<Node>): Path? {
-        return target.path(destination, visitedNodes)?.also { it prepend this }
+    internal fun path(destination: Node, visitedNodes: List<Node>): Path {
+        return target.path(destination, visitedNodes).also { it prepend this }
     }
 }
 

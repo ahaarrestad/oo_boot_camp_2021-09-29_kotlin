@@ -8,12 +8,25 @@ package com.nrkei.training.oo.graph
 
 import com.nrkei.training.oo.graph.Link.Companion.cost
 
-class Path internal constructor() {
-    private val links = mutableListOf<Link>()
+abstract class Path internal constructor() {
+    internal open infix fun prepend(link: Link) { } // By default, ignore
 
-    internal infix fun prepend(link: Link) = links.add(link)
+    abstract fun cost(): Double
 
-    fun cost() = links.cost()
+    abstract fun hopCount(): Int
 
-    fun hopCount() = links.size
+    internal class ActualPath internal constructor() : Path() {
+        private val links = mutableListOf<Link>()
+
+        override infix fun prepend(link: Link) { links.add(link) }
+
+        override fun cost() = links.cost()
+
+        override fun hopCount() = links.size
+    }
+
+    internal object NONE: Path() {
+        override fun cost() = Double.POSITIVE_INFINITY
+        override fun hopCount() = Int.MAX_VALUE
+    }
 }

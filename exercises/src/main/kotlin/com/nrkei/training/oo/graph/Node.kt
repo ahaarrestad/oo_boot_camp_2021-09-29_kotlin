@@ -23,15 +23,16 @@ class Node {
     infix fun cost(destination: Node) = cost(destination, LEAST_COST)
 
     infix fun path(destination: Node) = path(destination, noVisitedNodes)
-        ?: throw IllegalArgumentException("Destination is unreachable")
+        .also { result -> require(result != Path.NONE) { "Destination is unreachable" } }
 
     @Suppress("ComplexMethod")
-    internal fun path(destination: Node, visitedNodes: List<Node>): Path? {
-        if (this == destination) return Path()
-        if (this in visitedNodes) return null
+    internal fun path(destination: Node, visitedNodes: List<Node>): Path {
+        if (this == destination) return Path.ActualPath()
+        if (this in visitedNodes) return Path.NONE
         return links
             .map { it.path(destination, visitedNodes + this) }
-            .minByOrNull{ it?.cost() ?: Double.POSITIVE_INFINITY }
+            .minByOrNull{ it.cost() }
+            ?: Path.NONE
     }
 
     private fun cost(destination: Node, strategy: CostStrategy /* = (kotlin.Double) -> kotlin.Double */) =
