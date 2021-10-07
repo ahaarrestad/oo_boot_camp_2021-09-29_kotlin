@@ -6,12 +6,10 @@
 
 package com.nrkei.training.oo.graph
 
-import com.nrkei.training.oo.graph.Path.ActualPath
-
 class Node {
     private val links = mutableListOf<Link>()
 
-    infix fun canReach(destination: Node) = path(destination, noVisitedNodes, Path::cost) != Path.NONE
+    infix fun canReach(destination: Node) = paths(destination).isNotEmpty()
 
     infix fun hopCount(destination: Node) = path(destination, Path::hopCount).hopCount()
 
@@ -23,23 +21,14 @@ class Node {
 
     @Suppress("ComplexMethod")
     internal fun paths(destination: Node, visitedNodes: List<Node>): List<Path> {
-        if (this == destination) return listOf(ActualPath())
+        if (this == destination) return listOf(Path())
         if (this in visitedNodes) return emptyList()
         return links.flatMap { it.paths(destination, visitedNodes + this) }
     }
 
-    private fun path(destination: Node, strategy: PathStrategy) = path(destination, noVisitedNodes, strategy)
-        .also { result -> require(result != Path.NONE) { "Destination is unreachable" } }
-
-    @Suppress("ComplexMethod")
-    internal fun path(destination: Node, visitedNodes: List<Node>, strategy: PathStrategy): Path {
-        if (this == destination) return ActualPath()
-        if (this in visitedNodes) return Path.NONE
-        return links
-            .map { it.path(destination, visitedNodes + this, strategy) }
-            .minByOrNull{ strategy(it).toDouble() }
-            ?: Path.NONE
-    }
+    private fun path(destination: Node, strategy: PathStrategy) = paths(destination)
+        .minByOrNull { strategy(it).toDouble() }
+        ?: throw IllegalArgumentException("Destination is unreachable")
 
     private val noVisitedNodes = emptyList<Node>()
 
