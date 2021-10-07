@@ -6,44 +6,28 @@
 
 package com.nrkei.training.oo.graph
 
-import com.nrkei.training.oo.graph.Link.Companion.FEWEST_HOPS
-import com.nrkei.training.oo.graph.Link.Companion.LEAST_COST
-
 class Node {
     private val links = mutableListOf<Link>()
 
-    companion object {
-        private const val UNREACHABLE = Double.POSITIVE_INFINITY
-    }
+    infix fun canReach(destination: Node) = path(destination, noVisitedNodes, Path::cost) != Path.NONE
 
-    infix fun canReach(destination: Node) = cost(destination, noVisitedNodes, LEAST_COST) != UNREACHABLE
+    infix fun hopCount(destination: Node) = path(destination, Path::hopCount).hopCount()
 
-    infix fun hopCount(destination: Node) = cost(destination, FEWEST_HOPS).toInt()
+    infix fun cost(destination: Node) = path(destination).cost()
 
-    infix fun cost(destination: Node) = cost(destination, LEAST_COST)
+    infix fun path(destination: Node) = path(destination, Path::cost)
 
-    infix fun path(destination: Node) = path(destination, noVisitedNodes)
+    private fun path(destination: Node, strategy: PathStrategy) = path(destination, noVisitedNodes, strategy)
         .also { result -> require(result != Path.NONE) { "Destination is unreachable" } }
 
     @Suppress("ComplexMethod")
-    internal fun path(destination: Node, visitedNodes: List<Node>): Path {
+    internal fun path(destination: Node, visitedNodes: List<Node>, strategy: PathStrategy): Path {
         if (this == destination) return Path.ActualPath()
         if (this in visitedNodes) return Path.NONE
         return links
-            .map { it.path(destination, visitedNodes + this) }
-            .minByOrNull{ it.cost() }
+            .map { it.path(destination, visitedNodes + this, strategy) }
+            .minByOrNull{ strategy(it).toDouble() }
             ?: Path.NONE
-    }
-
-    private fun cost(destination: Node, strategy: CostStrategy /* = (kotlin.Double) -> kotlin.Double */) =
-        cost(destination, noVisitedNodes, strategy)
-            .also { result -> require(result != UNREACHABLE) { "Destination is unreachable" } }
-
-    @Suppress("ComplexMethod")
-    internal fun cost(destination: Node, visitedNodes: List<Node>, strategy: CostStrategy): Double {
-        if (this == destination) return 0.0
-        if (this in visitedNodes || links.isEmpty()) return UNREACHABLE
-        return links.minOf { it.cost(destination, visitedNodes + this, strategy) }
     }
 
     private val noVisitedNodes = emptyList<Node>()
